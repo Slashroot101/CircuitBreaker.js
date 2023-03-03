@@ -1,0 +1,32 @@
+{
+  "name": "circuitbreaker.js",
+  "version": "1.0.0",
+  "description": "a circuit breaker for javascript apps",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slashroot101/CircuitBreaker.js.git"
+  },
+  "author": "slashroot101",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Slashroot101/CircuitBreaker.js/issues"
+  },
+  "homepage": "https://github.com/Slashroot101/CircuitBreaker.js#readme",
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.21.0",
+    "@types/jest": "^29.4.0",
+    "jest": "^29.4.3",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.20.2"
+  }
+}
