@@ -1,3 +1,4 @@
+import { DependencyManager } from "./Dependencymanager";
 import { ICircuitBreakerOptions, CircuitBreakerState } from "./types";
 
 export class CircuitBreaker {
@@ -9,18 +10,18 @@ export class CircuitBreaker {
   private successCount: number;
   private timeout: number;
   private nextAttempt: Date;
-  private fallback: Function;
+  private dependencies: DependencyManager;
 
   constructor(options: ICircuitBreakerOptions){
     this.state = options.state || CircuitBreakerState.CLOSED;
     this.action = options.action;
-    this.fallback = options.fallback;
     this.failureThreshold = options.failureThreshold || 3;
     this.failureCount = 0;
     this.successThreshold = options.successThreshold  || 2;
     this.successCount = 0;
     this.timeout = options.timeout || 1000;
     this.nextAttempt = new Date();
+    this.dependencies = options.dependencies;
   }
 
   status(action: string) {
@@ -50,10 +51,20 @@ export class CircuitBreaker {
     }
   }
 
-  async tryFallback(...args: any[]){
+  //handle fallback, if no dependencies are available, return an error
+  async tryFallback(index: number, ...args: any[]){
+    if(index > this.dependencies?.getNumberOfDependencies()){
+      throw Error('No dependencies available')
+    }
+    const dependency = this.dependencies?.getNextBestDependency(index);
+    if(!dependency){
+      return new Error("No dependencies available");
+    }
     try {
-      return await this.fallback(args);
+      return await dependency.fallback(args);
     } catch (err: any) {
+      this.tryFallback(index + 1, args)
+      //somehow keep metrics on this, recursively grab next dependency,
       return err;
     }
   }
