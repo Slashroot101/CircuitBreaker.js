@@ -43,8 +43,16 @@ export class CircuitBreaker {
     }
 
     try {
-      const response = await this.action(args);
-      return this.success(response);
+      //generate random boolean to determine if the circuit breaker should route traffic half open
+      const shouldRouteTraffic = Math.random() > 0.5;
+      if(this.state === CircuitBreakerState.HALF_OPEN && shouldRouteTraffic || this.state === CircuitBreakerState.CLOSED){
+       const response = await this.action(args);
+       return this.success(response);
+      }
+      //if the circuit breaker is open, try to use a fallback
+      if(this.state === CircuitBreakerState.OPEN){
+        return this.tryFallback(0, this.dependencies, args);
+      }
     } catch (err: any) {
       console.log('failed')
       return this.fail(args);
@@ -85,10 +93,12 @@ export class CircuitBreaker {
   //logic that handles failed requests
   fail(...args: any[]): any {
     this.failureCount++;
+    //open circuit breaker if threshold is met
     if (this.failureCount >= this.failureThreshold) {
       this.state = CircuitBreakerState.OPEN;
       this.nextAttempt = new Date(Date.now() + this.timeout);
     }
+    
     this.status("Failure");
     return this.tryFallback(0, this.dependencies, args);
   }
