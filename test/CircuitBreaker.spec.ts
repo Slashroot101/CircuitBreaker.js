@@ -33,11 +33,11 @@ const dependency2 = {
   priority: 2
 }
 const dependency3 = {
-  dependencyName: 'test2',
+  dependencyName: 'test3',
   healthCheck: () => Promise.resolve({dependencyName: 'test2', healthy: false}),
   tolerance: 0.5,
   fallback: () => Promise.resolve(),
-  priority: 2
+  priority: 3
 }
 
 let dependencyManager = new DependencyManager(1000)
