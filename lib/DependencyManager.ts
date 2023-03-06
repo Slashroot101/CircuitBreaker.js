@@ -53,7 +53,7 @@ export class DependencyManager {
       return dependencyStatus.healthy;
     }
 
-    if(failures / requests?.length > tolerance * .01){
+    if(failures / requests.length > tolerance * .01){
       return false;
     }
 
