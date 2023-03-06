@@ -42,8 +42,7 @@ export class DependencyManager {
   public isDependencyHealthy(name: string) {
     const dependency = this.dependencies.filter(x => x.dependencyName === name)[0];
     const dependencyStatus = this.dependencyStatus.get(name);
-    if(!dependencyStatus) {throw new Error('Dependency not found')};
-    if(!dependency) {throw new Error('Dependency not found')};
+    if(!dependency || !dependencyStatus) {throw new Error('Dependency not found')};
     const tolerance = dependency.tolerance;
 
     const requests = this.dependencyStatus.get(dependency.dependencyName)?.requestBuffer?.toArray();
