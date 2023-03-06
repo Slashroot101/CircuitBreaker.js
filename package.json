@@ -27,6 +27,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.20.2"
+    "@babel/preset-env": "^7.20.2",
+    "ring-buffer-ts": "^1.2.0"
   }
 }

@@ -11,7 +11,6 @@ import { DependencyManager } from "../Dependencymanager";
 
 export interface ICircuitBreakerOptions extends Partial<CircuitBreakerOptions>{
   action: Function;
-  fallback: Function;
   dependencies: DependencyManager;
 }
 
@@ -26,7 +25,6 @@ export type DependencyConfiguration = {
   healthCheck: HealthCheckFunction;
   //tolerance expressed as a percentage of requests that can fail before we fall over
   tolerance: number;
-  fallback: Function;
   priority: number;
 }
 

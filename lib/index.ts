@@ -52,20 +52,18 @@ export class CircuitBreaker {
   }
 
   //handle fallback, if no dependencies are available, return an error
-  async tryFallback(index: number, ...args: any[]){
-    if(index > this.dependencies?.getNumberOfDependencies()){
-      throw Error('No dependencies available')
-    }
+  async tryFallback(index: number, dependencies: DependencyManager, ...args: any[]): Promise<any>{
     const dependency = this.dependencies?.getNextBestDependency(index);
     if(!dependency){
       return new Error("No dependencies available");
     }
     try {
-      return await dependency.fallback(args);
+      const resp = await dependency.fallback(args);
+      await this.dependencies.reportRequest(dependency.dependencyName, true);
+      return resp;
     } catch (err: any) {
-      this.tryFallback(index + 1, args)
-      //somehow keep metrics on this, recursively grab next dependency,
-      return err;
+      await this.dependencies.reportRequest(dependency.dependencyName, false);
+      return this.tryFallback(index + 1, dependencies, args);
     }
   }
 
@@ -92,6 +90,6 @@ export class CircuitBreaker {
       this.nextAttempt = new Date(Date.now() + this.timeout);
     }
     this.status("Failure");
-    return this.tryFallback(args);
+    return this.tryFallback(0, this.dependencies, args);
   }
 }

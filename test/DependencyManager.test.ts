@@ -1,6 +1,5 @@
 import { DependencyManager } from "../lib/Dependencymanager";
 
-
 describe('DependencyManager', () => {
   it('should succeed with no dependencies registered', () => {
     const dependencyManager = new DependencyManager(1000);
@@ -13,6 +12,7 @@ describe('DependencyManager', () => {
       dependencyName: 'test',
       healthCheck: () => Promise.resolve({dependencyName: 'test', healthy: true}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 1
     }
     dependencyManager.register(dependency);
@@ -26,6 +26,7 @@ describe('DependencyManager', () => {
       dependencyName: 'test',
       healthCheck: () => Promise.resolve({dependencyName: 'test', healthy: true}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 1
     }
     const spy = jest.spyOn(dependency, 'healthCheck');
@@ -43,25 +44,28 @@ describe('DependencyManager', () => {
       dependencyName: 'test',
       healthCheck: () => Promise.resolve({dependencyName: 'test', healthy: true}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 1
     }
     const dependency2 = {
       dependencyName: 'test2',
       healthCheck: () => Promise.resolve({dependencyName: 'test2', healthy: false}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 2
     }
     const dependency3 = {
       dependencyName: 'test2',
       healthCheck: () => Promise.resolve({dependencyName: 'test2', healthy: false}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 2
     }
     dependencyManager.register(dependency);
     dependencyManager.register(dependency2);
     dependencyManager.register(dependency3);
     await dependencyManager.evaluateDependencies();
-    expect(dependencyManager.getNextBestDependency()).toEqual(dependency);
+    expect(dependencyManager.getNextBestDependency(0)).toEqual(dependency);
     dependencyManager.close();
   });
   
@@ -71,25 +75,28 @@ describe('DependencyManager', () => {
       dependencyName: 'test',
       healthCheck: () => Promise.resolve({dependencyName: 'test', healthy: false}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 1
     }
     const dependency2 = {
       dependencyName: 'test2',
       healthCheck: () => Promise.resolve({dependencyName: 'test2', healthy: true}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 2
     }
     const dependency3 = {
       dependencyName: 'test2',
       healthCheck: () => Promise.resolve({dependencyName: 'test2', healthy: false}),
       tolerance: 0.5,
+      fallback: () => Promise.resolve(),
       priority: 2
     }
     dependencyManager.register(dependency);
     dependencyManager.register(dependency2);
     dependencyManager.register(dependency3);
     await dependencyManager.evaluateDependencies();
-    expect(dependencyManager.getNextBestDependency()).toEqual(dependency2);
+    expect(dependencyManager.getNextBestDependency(0)).toEqual(dependency2);
     dependencyManager.close();
   });
 });
